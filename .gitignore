@@ -1,0 +1,38 @@
+# ==========================================================================
+# DataFacil Compliance - Arquivo de Ignorados do Git
+# ==========================================================================
+
+# Imagens não utilizadas / Testes de Hero
+public/images/hero-bg2.jpg
+public/images/hero-bg3.jpg
+public/images/hero-bg4.jpg
+.public/images/hero-bg2.jpg
+.public/images/hero-bg3.jpg
+.public/images/hero-bg4.jpg
+
+# Dependências (Caso venha a utilizar NPM no futuro)
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Arquivos de Sistema Operacional
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Pastas e Arquivos de Editores/IDEs (VS Code, IntelliJ, etc)
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Arquivos de Log e Cache
+*.log
+.cache/
