@@ -1,25 +1,39 @@
 /* ==========================================================================
-   Fase 3: Interatividade em Vanilla JS (ES6+)
+   Fase 3 & 4: Interatividade em Vanilla JS (ES6+)
    Projeto: DataFacil Compliance
    ========================================================================== */
 
 document.addEventListener('DOMContentLoaded', () => {
     
-    // 1. Navegação Suave (Smooth Scroll)
-    const linksInternos = document.querySelectorAll('a[href^="#"]');
+    // 1. Navegação Suave Universal (Smooth Scroll)
+    // Seleciona todos os links que começam com '#' ou contêm a extensão '.html#'
+    const linksInternos = document.querySelectorAll('a[href*="#"]');
     
     linksInternos.forEach(anchor => {
         anchor.addEventListener('click', function (e) {
+            
+            // Verifica se o link é apenas para a mesma página
             const href = this.getAttribute('href');
+            
+            // Ignora links vazios
             if (href === '#') return;
 
-            e.preventDefault();
-            const target = document.querySelector(href);
-            if(target) {
-                window.scrollTo({
-                    top: target.offsetTop - 70, // Compensa a altura do header fixo
-                    behavior: 'smooth'
-                });
+            // Se o link contiver 'html#', mas for para a página atual, processa.
+            // Se for para uma tela diferente (ex: clicar no link 'Início' estando na página de Política),
+            // o navegador segue o comportamento nativo e carrega a nova página.
+            const urlFormatada = new URL(this.href);
+            if (urlFormatada.pathname === window.location.pathname) {
+                e.preventDefault();
+                
+                const targetId = urlFormatada.hash;
+                const target = document.querySelector(targetId);
+                
+                if(target) {
+                    window.scrollTo({
+                        top: target.offsetTop - 85, // Compensa a altura exata do header fixo
+                        behavior: 'smooth'
+                    });
+                }
             }
         });
     });
@@ -35,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // 3. Lógica do Formulário de Contato (Simulação de Envio)
+    // 3. Lógica do Formulário de Contato (Index)
     const form = document.getElementById('leadForm');
     
     if(form) {
@@ -44,7 +58,6 @@ document.addEventListener('DOMContentLoaded', () => {
             const btn = form.querySelector('button');
             const textOriginal = btn.innerText;
             
-            // Estado de carregamento
             btn.innerText = 'Processando...';
             btn.style.opacity = '0.7';
             btn.disabled = true;
@@ -62,39 +75,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // 4. Lógica do Modal de Política de Privacidade
-    const modal = document.getElementById('privacyModal');
-    const openBtn = document.getElementById('openPrivacy');
-    const closeBtn = document.querySelector('.close-modal');
+    // 4. Highlight do Menu Lateral na Página de Privacidade
+    // Esta função ilumina o link no Índice de acordo com a seção que o usuário está lendo
+    const observerOptions = {
+        root: null,
+        rootMargin: '-100px 0px -60% 0px',
+        threshold: 0
+    };
 
-    if(modal && openBtn && closeBtn) {
-        // Abrir Modal
-        openBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            modal.style.display = 'block';
-            document.body.style.overflow = 'hidden'; 
-        });
-
-        // Fechar Modal pelo "X"
-        closeBtn.addEventListener('click', () => {
-            modal.style.display = 'none';
-            document.body.style.overflow = 'auto'; 
-        });
-
-        // Fechar Modal clicando fora da caixa de conteúdo
-        window.addEventListener('click', (e) => {
-            if (e.target === modal) {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
+    const observer = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+            const id = entry.target.getAttribute('id');
+            const navLink = document.querySelector(`.sticky-nav nav ul li a[href="#${id}"]`);
+            
+            if (navLink) {
+                if (entry.isIntersecting) {
+                    // Remove a classe active de todos
+                    document.querySelectorAll('.sticky-nav nav ul li a').forEach(link => link.classList.remove('active'));
+                    // Adiciona na seção visível
+                    navLink.classList.add('active');
+                }
             }
         });
-        
-        // Fechar com a tecla ESC
-        window.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && modal.style.display === 'block') {
-                modal.style.display = 'none';
-                document.body.style.overflow = 'auto';
-            }
-        });
-    }
+    }, observerOptions);
+
+    // Observa todas as seções dentro do corpo jurídico
+    document.querySelectorAll('.legal-body section').forEach((section) => {
+        observer.observe(section);
+    });
 });
